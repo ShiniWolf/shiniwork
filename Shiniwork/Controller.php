@@ -7,23 +7,23 @@
 
     class Controller
     {
-        protected $app;
+        protected $container;
 
-        public function __construct ()
+        public function __construct ($container)
         {
-            $this->app = Slim::getInstance();
+            $this->container = $container;
         }
 
-        public function render ($template, $data = [])
-        {
-            $this->app->render($template, $data);
-        }
-
-        public function renderJson ($array, $status_code = 200)
-        {
-            $array = !is_array($array) ? [$array] : $array;
-            $this->app->response->headers->set('Content-Type', 'application/json');
-            $this->app->response->setStatus($status_code);
-            $this->app->response->setBody(json_encode($array));
-        }
+//        public function render ($template, $data = [])
+//        {
+//            $this->app->render($template, $data);
+//        }
+//
+//        public function renderJson ($array, $status_code = 200)
+//        {
+//            $array = !is_array($array) ? [$array] : $array;
+//            $this->app->response->headers->set('Content-Type', 'application/json');
+//            $this->app->response->setStatus($status_code);
+//            $this->app->response->setBody(json_encode($array));
+//        }
     }
