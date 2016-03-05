@@ -7,10 +7,11 @@
 
     class Shiniwork extends App
     {
-        public function __construct ($container = [])
+        public function __construct ()
         {
             session_start();
 
+            $container = new Settings();
             parent::__construct($container);
         }
     }
