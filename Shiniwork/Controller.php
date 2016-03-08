@@ -8,10 +8,12 @@
     class Controller
     {
         protected $container;
+        protected $em;
 
         public function __construct ($container)
         {
             $this->container = $container;
+            $this->em = new EntityManager($this->container);
         }
 
 //        public function render ($template, $data = [])

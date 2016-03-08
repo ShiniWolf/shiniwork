@@ -3,6 +3,8 @@
     namespace Shiniwork;
 
 
+    use Doctrine\DBAL\Configuration;
+    use Doctrine\DBAL\DriverManager;
     use Slim\App;
     use Slim\Views\Twig;
     use Slim\Views\TwigExtension;
@@ -17,6 +19,7 @@
             parent::__construct($container);
 
             $this->registerView();
+            $this->registerDatabase();
         }
 
         protected function registerView ()
@@ -38,5 +41,24 @@
             else {
                 throw new \Exception('Key "view" and "view[twig]" not found in config file');
             }
+
+            return $this;
+        }
+
+        protected function registerDatabase ()
+        {
+            $container = $this->getContainer();
+            $settings  = $container->settings;
+
+            if (!empty($settings['database'])) {
+                $container['database'] = function ($c) {
+                    return DriverManager::getConnection($c->settings['database'], new Configuration());
+                };
+            }
+            else {
+                throw new \Exception('Key "database" not found in config file');
+            }
+
+            return $this;
         }
     }
