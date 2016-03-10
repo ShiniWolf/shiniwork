@@ -3,6 +3,7 @@
     namespace Shiniwork;
 
 
+    use Shiniwork\ORM\EntityManager;
     use Slim\Slim;
 
     class Controller
