@@ -23,8 +23,7 @@
         {
             if (class_exists($entity)) {
                 $entity_name = explode('\\', $entity);
-                $entity_name = new StringType(end($entity_name));
-                $entity_name = $entity_name->toSnakeCase();
+                $entity_name = (new StringType(end($entity_name)))->toSnakeCase();
 
                 $this->entity      = $entity;
                 $this->entity_name = $entity_name;
@@ -37,6 +36,81 @@
             $this->entity_options = array_merge($this->default_entity_options, $entity_options);
 
             return $this;
+        }
+
+        public function save ($entity)
+        {
+            $execute = function ($type, $entity) {
+                $updatedFields = $entity->_updated_fields;
+
+                if ($entity->_is_new === true || !empty($updatedFields)) {
+                    $model   = new \ReflectionClass($entity);
+                    $qb      = $this->container->database->createQueryBuilder();
+                    $table   = (new StringType($model->getShortName()))->toSnakeCase();
+                    $updated = false;
+
+                    // Before save hook
+                    if (method_exists($entity, 'beforeSave')) {
+                        $entity->beforeSave($type);
+                    }
+
+                    // Set request type INSERT or UPDATE
+                    $qb->$type($table);
+
+                    // Set value to all accessible properties
+                    foreach ($model->getProperties() as $property) {
+                        $name = $property->getName();
+                        if ($entity->isWritable($name) && (!!$entity->_is_new || !$entity->_is_new && $entity->isUpdated($name))) {
+                            $value = $entity->$name;
+
+                            // Set created date for new entity
+                            if (!!$entity->_is_new) {
+                                $qb->setValue($name, ':' . $name);
+
+                                if ($name === 'created' && empty($value)) {
+                                    $entity->$name = new \DateTime();
+                                    $value         = $entity->$name->format(\DateTime::W3C);
+                                }
+                            }
+                            else {
+                                $qb->set($name, ':' . $name);
+                            }
+
+                            $qb->setParameter($name, $value);
+                            $updated = true;
+                        }
+
+                        // Set updated date for existing entity
+                        if (!$entity->_is_new && $name === 'updated') {
+                            $entity->$name = new \DateTime();
+
+                            $qb->set($name, ':' . $name)
+                                ->setParameter($name, $entity->$name->format(\DateTime::W3C));
+                        }
+                    }
+
+                    // Set id clause for existing entity
+                    if ($entity->_is_new === false) {
+                        $qb->where($entity::$_primary_key . ' = :id')
+                            ->setParameter('id', $entity->{$entity::$_primary_key});
+                    }
+
+                    // Execute only if fields updated
+                    if (!!$updated) {
+                        $stmt = $qb->execute();
+
+                        if ($stmt) {
+                            $entity->initializeFields($entity->_is_new ? $this->container->database->lastInsertId() : $entity->id);
+                        }
+
+                        return $stmt;
+                    }
+                }
+
+                return false;
+            };
+
+            return $entity->_is_new ? $execute('insert', $entity) : $execute('update', $entity);
         }
 
         public function find ($criterias = [], $options = [])
@@ -110,16 +184,19 @@
                     \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE,
                     $this->entity,
                     [
-                        /*'container' => $this->container,*/
                         '_is_new' => false
                     ]);
             }
 
             if ($limit === 1) {
                 $result = $stmt->fetch();
+                if ($result) {
+                    $result->initializeFields();
+                }
             }
             else {
                 foreach ($stmt->fetchAll() as $entity) {
+                    $entity->initializeFields();
                     $result[] = $entity;
                 }
             }
