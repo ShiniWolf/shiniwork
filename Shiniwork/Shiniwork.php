@@ -29,9 +29,7 @@
 
             if (!empty($settings['view']) && !empty($settings['view']['twig'])) {
                 $container['view'] = function ($c) {
-                    $view = new Twig($c->settings['view']['template_path'], [
-                        'cache' => $c->settings['view']['twig']['cache']
-                    ]);
+                    $view = new Twig($c->settings['view']['template_path'], $c->settings['view']['twig']);
 
                     $view->addExtension(new TwigExtension($c['router'], $c['request']->getUri()));
 
