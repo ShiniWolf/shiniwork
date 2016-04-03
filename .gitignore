@@ -1,4 +1,5 @@
-.idea/
-vendor/
-website/
-composer.lock
+*.iml
+/vendor
+/composer.phar
+/composer.lock
+/.idea
