@@ -19,7 +19,6 @@
         protected $mode             = 'production';
 
         protected $document_root    = '';
-        protected $webroot_path     = '';
         protected $root_path        = '';
         protected $config_directory = '';
 
@@ -33,11 +32,10 @@
             $settings            = array_merge($this->default_settings, $settings);
             $DS                  = DIRECTORY_SEPARATOR;
             $this->document_root = !empty($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] . $DS : '';
-//            $this->webroot_path  = !empty($_SERVER['SCRIPT_FILENAME']) ? dirname($_SERVER['SCRIPT_FILENAME']) . $DS : '';
-//            $this->root_path     = !empty($this->webroot_path) ? $this->webroot_path . '..' . $DS : '';
+            $this->root_path     = !empty($this->document_root) ? dirname($this->document_root) . $DS : '';
 
-            $config_directory       = $this->document_root . $DS . trim($settings['config_directory'], '/');
-            $this->config_directory = !empty($this->document_root) && is_dir($config_directory) ? $config_directory . $DS : '';
+            $config_directory       = $this->root_path . $DS . trim($settings['config_directory'], '/');
+            $this->config_directory = !empty($this->root_path) && is_dir($config_directory) ? $config_directory . $DS : '';
 
             $this->configureMode()
                  ->parseConfig();
@@ -101,5 +99,15 @@
         public function getDocumentRoot ()
         {
             return $this->document_root;
+        }
+
+        /**
+         * Get root path
+         *
+         * @return string
+         */
+        public function getRootPath ()
+        {
+            return $this->root_path;
         }
     }
