@@ -46,7 +46,7 @@
         /**
          * Configure website environment with $_SERVER['HTTP_HOST'] (development, preprod, prod)
          *
-         * @return $this
+         * @return Settings $this
          */
         protected function configureMode ()
         {
@@ -70,7 +70,7 @@
         /**
          * Parse config files in $this->config_directory
          *
-         * @return $this
+         * @return Settings $this
          */
         protected function parseConfig ()
         {

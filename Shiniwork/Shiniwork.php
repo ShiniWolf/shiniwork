@@ -40,7 +40,7 @@
         /**
          * Register twig view in Slim container
          *
-         * @return $this
+         * @return Shiniwork $this
          */
         protected function registerView ()
         {
@@ -63,7 +63,7 @@
         /**
          * Register Eloquent database in Slim container
          *
-         * @return $this
+         * @return Shiniwork $this
          */
         protected function registerDatabase ()
         {
@@ -88,7 +88,7 @@
         /**
          * Register Swiftmailer in Slim container
          *
-         * @return $this
+         * @return Shiniwork $this
          */
         protected function registerMailer ()
         {
@@ -116,7 +116,7 @@
         /**
          * Register JWT Authenticate in Slim container
          *
-         * @return $this
+         * @return Shiniwork $this
          */
         protected function registerJWT ()
         {
@@ -135,7 +135,7 @@
         /**
          * Add JWT Middleware with jwt config
          *
-         * @return $this
+         * @return Shiniwork $this
          */
         protected function addJWTMiddleware ()
         {
