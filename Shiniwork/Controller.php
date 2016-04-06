@@ -14,6 +14,7 @@
     class Controller
     {
         protected $container;
+        protected $global_data = [];
 
         /**
          * Controller constructor.
@@ -23,6 +24,10 @@
         public function __construct (ContainerInterface $container)
         {
             $this->container = $container;
+
+            if (method_exists($this, 'registerGlobalData')) {
+                $this->registerGlobalData();
+            }
         }
 
         /**
@@ -46,5 +51,20 @@
             }
 
             return $response->withRedirect($redirect_url, $status);
+        }
+
+        /**
+         * Render view with global data
+         *
+         * @param Response $response
+         * @param string $filename
+         * @param array $data
+         * @return mixed
+         */
+        public function render (Response $response, $filename, array $data = [])
+        {
+            $data = array_replace_recursive($this->global_data, $data);
+
+            return $this->container->get('view')->render($response, $filename, $data);
         }
     }
