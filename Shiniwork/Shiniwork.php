@@ -52,6 +52,7 @@
                     $view = new Twig($c->getRootPath() . trim($c->settings['view']['template_path'], '/'), $c->settings['view']['twig']);
 
                     $view->addExtension(new TwigExtension($c['router'], $c['request']->getUri()));
+                    $view->addExtension(new \Twig_Extension_Debug());
 
                     return $view;
                 };
