@@ -24,10 +24,6 @@
         public function __construct (ContainerInterface $container)
         {
             $this->container = $container;
-
-            if (method_exists($this, 'registerGlobalData')) {
-                $this->registerGlobalData();
-            }
         }
 
         /**
@@ -63,6 +59,10 @@
          */
         public function render (Response $response, $filename, array $data = [])
         {
+            if (method_exists($this, 'registerGlobalData')) {
+                $this->registerGlobalData();
+            }
+
             $data = array_replace_recursive($this->global_data, $data);
 
             return $this->container->get('view')->render($response, $filename, $data);
