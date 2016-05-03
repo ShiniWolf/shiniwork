@@ -147,8 +147,9 @@
                     $container['jwt'] = $args['decoded'];
                 },
                 'error'    => function (Request $request, Response $response) use ($container) {
-                    if (!empty($settings['jwt']['login_page'])) {
-                        return $response->withRedirect($container->get('router')->pathFor($settings['jwt']['login_page']), 401);
+                    $settings_jwt = $container->get('settings')['jwt'];
+                    if (!empty($settings_jwt['login_page'])) {
+                        return $response->withRedirect($container->get('router')->pathFor($settings_jwt['login_page']), 401);
                     }
                     else {
                         return $response->withStatus(401)
