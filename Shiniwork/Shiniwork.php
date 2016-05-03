@@ -140,18 +140,33 @@
          */
         protected function addJWTMiddleware ()
         {
-            $container = $this->getContainer();
-            $settings  = $container->get('settings');
+            $container      = $this->getContainer();
+            $settings       = $container->get('settings');
+            $extra_settings = [
+                'callback' => function (Request $request, Response $response, $args) use ($container) {
+                    $container['jwt'] = $args['decoded'];
+                },
+                'error'    => function (Request $request, Response $response) use ($container) {
+                    if (!empty($settings['jwt']['login_page'])) {
+                        return $response->withRedirect($container->get('router')->pathFor($settings['jwt']['login_page']), 401);
+                    }
+                    else {
+                        return $response->withStatus(401)
+                                        ->withJson(['message' => 'Authorization required']);
+                    }
+                }
+            ];
+
+            if (!empty($settings['jwt']['accept_methods'])) {
+                $extra_settings['rules'] = [
+                    new JwtAuthentication\RequestMethodRule([
+                        'passthrough' => $settings['jwt']['accept_methods']
+                    ])
+                ];
+            }
 
             if (!empty($settings['jwt'])) {
-                $jwt = array_merge($settings['jwt'], [
-                    'callback' => function (Request $request, Response $response, $args) use ($container) {
-                        $container['jwt'] = $args['decoded'];
-                    },
-                    'error'    => function (Request $request, Response $response) use ($container) {
-                        return $response->withRedirect($container->get('router')->pathFor('login_page'), 401);
-                    }
-                ]);
+                $jwt = array_merge($settings['jwt'], $extra_settings);
 
                 $this->add(new JwtAuthentication($jwt));
             }
