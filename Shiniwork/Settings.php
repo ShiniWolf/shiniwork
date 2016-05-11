@@ -54,7 +54,7 @@
             $host_part = explode('.', $host);
             $mode      = 'production';
 
-            if (end($host_part) === 'dev') {
+            if (preg_match('/dev(:[0-9])?/', end($host_part))) {
                 $mode = 'development';
             }
 
