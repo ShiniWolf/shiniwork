@@ -147,7 +147,7 @@
          */
         public function checkEmail ()
         {
-            if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
+            if (!empty($this->value) && !filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
                 $this->error = $this->default_rules[$this->rule];
             }
 
