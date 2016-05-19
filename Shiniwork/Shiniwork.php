@@ -62,7 +62,7 @@
         }
 
         /**
-         * Register Eloquent database in Slim container
+         * Register Eloquent database in Slim app (use Model now)
          *
          * @return Shiniwork $this
          */
@@ -72,15 +72,10 @@
             $settings  = $container->get('settings');
 
             if (!empty($settings['database'])) {
-                $container['database'] = function ($c) {
-                    $capsule = new Manager();
-                    $capsule->addConnection($c['settings']['database']);
-
-                    $capsule->setAsGlobal();
-                    $capsule->bootEloquent();
-
-                    return $capsule;
-                };
+                $capsule = new Manager();
+                $capsule->addConnection($settings['database']);
+                $capsule->setAsGlobal();
+                $capsule->bootEloquent();
             }
 
             return $this;
