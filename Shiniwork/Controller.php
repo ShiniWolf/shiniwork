@@ -29,10 +29,11 @@
         /**
          * Return json response if xhr else redirect to $route_name
          *
-         * @param array $data
+         * @param array  $data
          * @param string $route_name
-         * @param int $status
-         * @param array $query_params
+         * @param int    $status
+         * @param array  $query_params
+         *
          * @return Response
          */
         public function apiResponse (array $data, $route_name, $status = 200, array $query_params = [])
@@ -53,8 +54,9 @@
          * Render view with global data
          *
          * @param Response $response
-         * @param string $filename
-         * @param array $data
+         * @param string   $filename
+         * @param array    $data
+         *
          * @return mixed
          */
         public function render (Response $response, $filename, array $data = [])
@@ -66,5 +68,15 @@
             $data = array_replace_recursive($this->global_data, $data);
 
             return $this->container->get('view')->render($response, $filename, $data);
+        }
+
+        /**
+         * Get Eloquent query log
+         *
+         * @return mixed
+         */
+        public function getQueryLog ()
+        {
+            return Manager::getQueryLog();
         }
     }
