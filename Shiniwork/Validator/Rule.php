@@ -2,6 +2,8 @@
 
     namespace Shiniwork\Validator;
 
+    use Slim\Http\UploadedFile;
+
 
     /**
      * Class Rule
@@ -21,19 +23,20 @@
             'numeric'  => 'This field must contain only numbers',
             'email'    => 'This field must contain an email',
             'url'      => 'This field must contain an url',
-            'phone'    => 'This field must contain a phone number'
+            'phone'    => 'This field must contain a phone number',
+            'maxsize'  => 'This field must contain too much char'
         ];
 
         /**
          * Rule constructor.
          *
          * @param string $rule
-         * @param mixed $value
+         * @param mixed  $value
          */
         public function __construct ($rule, $value)
         {
             $this->rule  = $rule;
-            $this->value = trim($value);
+            $this->value = $value instanceof UploadedFile ? $value : trim($value);
         }
 
         /**
@@ -77,7 +80,10 @@
          */
         public function checkRequired ()
         {
-            if (empty($this->value)) {
+            if ($this->value instanceof UploadedFile && $this->value->getError() !== UPLOAD_ERR_OK) {
+                $this->error = $this->default_rules[$this->rule];
+            }
+            else if (empty($this->value)) {
                 $this->error = $this->default_rules[$this->rule];
             }
 
@@ -183,13 +189,40 @@
         }
 
         /**
+         * Check if value length is inferior
+         *
+         * @return bool
+         */
+        public function checkMaxSize ()
+        {
+            $rule = explode(':', $this->rule);
+
+            if (isset($rule[1])) {
+                $maxsize = $rule[1];
+
+                if ($this->value instanceof UploadedFile) {
+                    if ($this->value->getSize() > $maxsize) {
+                        $this->error = $this->default_rules[$rule[0]];
+                    }
+                }
+                else if (strlen($this->value) > $maxsize) {
+                    $this->error = $this->default_rules[$rule[0]];
+                }
+            }
+
+            return empty($this->error);
+        }
+
+        /**
          * Run check function with rule type
          *
          * @return Rule $this
          */
         protected function dispatchCheck ()
         {
-            switch ($this->rule) {
+            $rule = explode(':', $this->rule);
+
+            switch ($rule[0]) {
                 case 'required':
                     $this->checkRequired();
                     break;
@@ -213,6 +246,9 @@
                     break;
                 case 'phone':
                     $this->checkPhone();
+                    break;
+                case 'maxsize':
+                    $this->checkMaxSize();
                     break;
             }
 

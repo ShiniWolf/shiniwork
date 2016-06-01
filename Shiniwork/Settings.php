@@ -110,4 +110,14 @@
         {
             return $this->root_path;
         }
+
+        /**
+         * Get production mode
+         *
+         * @return string
+         */
+        public function getMode ()
+        {
+            return $this->mode;
+        }
     }

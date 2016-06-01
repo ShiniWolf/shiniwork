@@ -22,12 +22,13 @@
          * Validator constructor.
          *
          * @param Request $request
-         * @param array $fields
+         * @param array   $fields
          */
         public function __construct (Request $request, array $fields = [])
         {
             $this->request = $request;
             $this->params  = $this->request->getParams();
+            $this->files   = $this->request->getUploadedFiles();
 
             if (!empty($fields) && is_array($fields)) {
                 $this->addFields($fields);
@@ -38,14 +39,14 @@
          * Add one field to validate
          *
          * @param string $name
-         * @param array $options
+         * @param array  $options
          *
          * @return Validator $this
          * @throws \Exception
          */
         public function addField ($name, array $options)
         {
-            if (array_key_exists($name, $this->params)) {
+            if (array_key_exists($name, $this->params) || array_key_exists($name, $this->files)) {
                 if (array_key_exists('rules', $options) && array_key_exists('messages', $options)) {
                     $this->fields[$name] = $options;
                 }
@@ -90,8 +91,9 @@
         {
             if (!empty($this->fields)) {
                 foreach ($this->fields as $name => $options) {
-                    if (isset($this->params[$name])) {
-                        $field_validator = new FieldValidator($name, $this->params[$name], $options);
+                    if (isset($this->params[$name]) || isset($this->files[$name])) {
+                        $param           = $this->params[$name] ?? $this->files[$name];
+                        $field_validator = new FieldValidator($name, $param, $options);
 
                         if ($errors = $field_validator->validate()) {
                             $this->errors[$name] = $errors;

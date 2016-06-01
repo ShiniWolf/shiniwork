@@ -76,6 +76,10 @@
                 $capsule->addConnection($settings['database']);
                 $capsule->setAsGlobal();
                 $capsule->bootEloquent();
+
+                if ($container->getMode() === 'development') {
+                    $capsule->connection()->enableQueryLog();
+                }
             }
 
             return $this;
