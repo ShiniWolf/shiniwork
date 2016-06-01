@@ -161,7 +161,7 @@
          */
         public function checkUrl ()
         {
-            if (!filter_var($this->value, FILTER_VALIDATE_URL)) {
+            if (!empty($this->value) && !filter_var($this->value, FILTER_VALIDATE_URL)) {
                 $this->error = $this->default_rules[$this->rule];
             }
 
@@ -175,7 +175,7 @@
          */
         public function checkPhone ()
         {
-            if (!preg_match('/^[+]?([\d]{0,3})?[\(\.\-\s]?(([\d]{1,3})[\)\.\-\s]*)?(([\d]{3,5})[\.\-\s]?([\d]{4})|([\d]{2}[\.\-\s]?){4})$/', $this->value)) {
+            if (!empty($this->value) && !preg_match('/^[+]?([\d]{0,3})?[\(\.\-\s]?(([\d]{1,3})[\)\.\-\s]*)?(([\d]{3,5})[\.\-\s]?([\d]{4})|([\d]{2}[\.\-\s]?){4})$/', $this->value)) {
                 $this->error = $this->default_rules[$this->rule];
             }
 
