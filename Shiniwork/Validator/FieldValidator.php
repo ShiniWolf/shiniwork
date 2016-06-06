@@ -18,8 +18,8 @@
          * FieldValidator constructor.
          *
          * @param string $name
-         * @param mixed  $value
-         * @param array  $options
+         * @param mixed $value
+         * @param array $options
          *
          * @throws \Exception
          */
@@ -73,10 +73,12 @@
         public function check ()
         {
             if (!empty($this->options['rules'])) {
-                foreach ($this->options['rules'] as $name) {
-                    $rule = new Rule($name, $this->value);
+                foreach ($this->options['rules'] as $index => $name) {
+                    $rule_name    = is_array($name) ? $index : $name;
+                    $rule_options = is_array($name) ? $name : [];
+                    $rule         = new Rule($rule_name, $this->value, $rule_options);
                     if (!$rule->check()) {
-                        $real_name   = explode(':', $name);
+                        $real_name   = explode(':', $rule_name);
                         $this->error = !empty($this->options['messages'][$real_name[0]]) ? $this->options['messages'][$real_name[0]] : $rule->getError();
                     }
                 }

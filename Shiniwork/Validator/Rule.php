@@ -11,8 +11,9 @@
      */
     class Rule
     {
-        protected $rule  = '';
-        protected $value = '';
+        protected $rule    = '';
+        protected $value   = '';
+        protected $options = [];
 
         protected $error         = '';
         protected $default_rules = [
@@ -24,19 +25,21 @@
             'email'    => 'This field must contain an email',
             'url'      => 'This field must contain an url',
             'phone'    => 'This field must contain a phone number',
-            'maxsize'  => 'This field must contain too much char'
+            'maxsize'  => 'This field must contain too much char',
+            'enum'     => 'This field must contain valid choice'
         ];
 
         /**
          * Rule constructor.
          *
          * @param string $rule
-         * @param mixed  $value
+         * @param mixed $value
          */
-        public function __construct ($rule, $value)
+        public function __construct ($rule, $value, array $options = [])
         {
-            $this->rule  = $rule;
-            $this->value = $value instanceof UploadedFile ? $value : trim($value);
+            $this->rule    = $rule;
+            $this->value   = $value instanceof UploadedFile ? $value : trim($value);
+            $this->options = is_array($options) ? $options : [];
         }
 
         /**
@@ -214,6 +217,20 @@
         }
 
         /**
+         * Check if value is in array of choice
+         *
+         * @return bool
+         */
+        public function checkEnum ()
+        {
+            if (!in_array($this->value, $this->options)) {
+                $this->error = $this->default_rules[$this->rule];
+            }
+
+            return empty($this->error);
+        }
+
+        /**
          * Run check function with rule type
          *
          * @return Rule $this
@@ -249,6 +266,9 @@
                     break;
                 case 'maxsize':
                     $this->checkMaxSize();
+                    break;
+                case 'enum':
+                    $this->checkEnum();
                     break;
             }
 

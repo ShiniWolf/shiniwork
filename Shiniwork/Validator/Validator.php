@@ -22,7 +22,7 @@
          * Validator constructor.
          *
          * @param Request $request
-         * @param array   $fields
+         * @param array $fields
          */
         public function __construct (Request $request, array $fields = [])
         {
@@ -39,7 +39,7 @@
          * Add one field to validate
          *
          * @param string $name
-         * @param array  $options
+         * @param array $options
          *
          * @return Validator $this
          * @throws \Exception
